@@ -1,7 +1,7 @@
 import test_bg from "./assets/test_bg.jpg";
 import * as yup from 'yup';
-import { useState, FormEvent } from 'react';
 import axios from 'axios';
+import { useState, FormEvent, useEffect } from 'react';
 
 // Type definitions for better type safety
 interface FormData {
@@ -18,6 +18,13 @@ interface FormErrors {
  * @returns {JSX.Element} A responsive login form with username and password fields
  */
 function Login() {
+    // Check for token and redirect if exists
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            window.location.href = '/dashboard';
+        }
+    }, []);
     // Yup validation schema for form fields
     const validationSchema = yup.object().shape({
         username: yup.string().required('Username is required'),
@@ -42,7 +49,7 @@ function Login() {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
     };
-    
+
     const renderFormField = (
         id: keyof FormData,
         label: string,
@@ -161,3 +168,4 @@ function Login() {
 }
 
 export default Login;
+
