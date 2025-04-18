@@ -56,9 +56,11 @@ function Login() {
             // Make API call to login endpoint
             const response = await axios.post('http://localhost:3001/api/login', formData);
             // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(response.data));
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             // Optionally, you can also store just the token if that's what the backend returns
             localStorage.setItem('token', response.data.token);
+            // Redirect to dashboard or another page
+            window.location.href = '/dashboard';
         } catch (err: any) {
             // Handle API errors
             if (err.response) {
