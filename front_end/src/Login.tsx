@@ -32,6 +32,7 @@ function Login() {
         password: '',
     });
     const [errors, setErrors] = useState<FormErrors>({});
+    const [isLoading, setIsLoading] = useState(false);
 
     /**
      * Updates form state when input values change
@@ -41,57 +42,7 @@ function Login() {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
     };
-
-    /**
-     * Handles form submission, validation, and API call
-     * @param {FormEvent} e - Form submission event
-     */
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            // Validate form data against schema
-            await validationSchema.validate(formData, { abortEarly: false });
-            setErrors({});
-
-            // Make API call to login endpoint
-            const response = await axios.post('http://localhost:3001/api/login', formData);
-            // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            // Optionally, you can also store just the token if that's what the backend returns
-            localStorage.setItem('token', response.data.token);
-            // Redirect to dashboard or another page
-            window.location.href = '/dashboard';
-        } catch (err: any) {
-            // Handle API errors
-            if (err.response) {
-                console.error('Backend error:', err.response.data);
-                if (err.response.status === 401) {
-                    alert(err.response.data.message);
-                }
-                if (err.response.data.message) {
-                    setErrors({ general: err.response.data.message });
-                }
-            }
-            // Handle validation errors
-            if (err instanceof yup.ValidationError) {
-                const validationErrors: FormErrors = {};
-                err.inner.forEach((error) => {
-                    if (error.path) {
-                        validationErrors[error.path] = error.message;
-                    }
-                });
-                setErrors(validationErrors);
-            }
-        }
-    };
-
-    /**
-     * Renders a form input field with label and error message
-     * @param {keyof FormData} id - Input field identifier
-     * @param {string} label - Input label text
-     * @param {string} type - Input type (text/password)
-     * @param {string} placeholder - Input placeholder text
-     */
+    
     const renderFormField = (
         id: keyof FormData,
         label: string,
@@ -117,6 +68,45 @@ function Login() {
         </div>
     );
 
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            // Validate form data against schema
+            await validationSchema.validate(formData, { abortEarly: false });
+            setErrors({});
+
+            // Make API call to login endpoint
+            const response = await axios.post('http://localhost:3001/api/login', formData);
+
+            // Store user data in localStorage
+            localStorage.setItem('token', JSON.stringify(response.data.token));
+
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+        } catch (err: any) {
+            if (err instanceof yup.ValidationError) {
+                // Handle validation errors
+                const validationErrors: FormErrors = {};
+                err.inner.forEach((error) => {
+                    if (error.path) {
+                        validationErrors[error.path] = error.message;
+                    }
+                });
+                setErrors(validationErrors);
+            } else if (err.response) {
+                // Handle API errors
+                console.error('Backend error:', err.response.data);
+                if (err.response.data.message) {
+                    setErrors({ general: err.response.data.message });
+                }
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="flex h-screen">
             {/* Login form container */}
@@ -124,7 +114,7 @@ function Login() {
                 <div className="flex items-center justify-center h-full">
                     <div className="bg-white p-8 rounded-lg shadow-xl w-[30rem]">
                         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-                        
+
                         <form onSubmit={handleSubmit}>
                             {renderFormField("username", "Username", "text", "Enter your username")}
                             {renderFormField("password", "Password", "password", "Enter your password")}
@@ -137,11 +127,14 @@ function Login() {
                                 </a>
                             </div>
 
-                            <button className="w-full px-4 py-2 font-bold text-white rounded 
+                            <button
+                                className={`w-full px-4 py-2 font-bold text-white rounded 
                                            bg-slate-900 hover:bg-slate-700 focus:outline-none 
-                                           focus:shadow-outline"
-                                type="submit">
-                                Sign In
+                                           focus:shadow-outline ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                type="submit"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Signing in...' : 'Sign In'}
                             </button>
 
                             <p className="text-sm text-center mt-4">

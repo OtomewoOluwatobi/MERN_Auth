@@ -11,11 +11,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     if (!isAuthenticated) {
         return <Navigate to="/" replace />;
     }
-    // Optionally, you can also check if the user data exists
-    const userData = localStorage.getItem('user');
-    if (!userData) {
-        return <Navigate to="/" replace />;
-    }
+    
     return <>{children}</>;
 };
 

@@ -2,17 +2,22 @@ import { useNavigate } from 'react-router-dom';
 import { FC, useCallback } from 'react';
 
 interface UserData {
-    fullname: string;
-    username: string;
+    user: {
+        fullname: string;
+        username: string;
+    }
 }
 
 const Dashboard: FC = () => {
     const navigate = useNavigate();
-    const userData: UserData = JSON.parse(localStorage.getItem('user') || '{}');
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+        navigate('/');
+        return;
+    }
+    const decodedToken = jwt_decode(token) as UserData;
     const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
         navigate('/');
     }, [navigate]);
 
@@ -36,9 +41,8 @@ const Dashboard: FC = () => {
             </div>
 
             <h1 className="text-3xl font-bold mb-4 text-center">
-                Welcome {userData.fullname}!
+                Welcome {decodedToken.user.fullname}!
             </h1>
-
             <div className="flex items-center justify-center mb-6">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -80,3 +84,17 @@ const Dashboard: FC = () => {
 };
 
 export default Dashboard;
+function jwt_decode(token: string): UserData {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        throw new Error('Invalid token');
+    }
+}

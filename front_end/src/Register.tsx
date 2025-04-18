@@ -1,6 +1,7 @@
 import test_bg from "./assets/test_bg.jpg";
 import { useState, FormEvent } from 'react';
 import * as yup from 'yup';
+import axios from 'axios';
 
 // Define the form data interface
 interface FormData {
@@ -37,6 +38,9 @@ function Register() {
 
     // Initialize error state
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    
+    // Initialize loading state
+    const [isLoading, setIsLoading] = useState(false);
 
     /**
      * Updates form data when input values change
@@ -56,17 +60,23 @@ function Register() {
         }
     };
 
-    /**
-     * Handles form submission and validation
-     */
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
             await validationSchema.validate(formData, { abortEarly: false });
-            // Form is valid, proceed with submission
-            console.log('Form data:', formData);
-            // TODO: Add API call here
-        } catch (err) {
+            const { confirmPassword, ...registrationData } = formData;
+            const response = await axios.post('http://localhost:3001/api/register', registrationData);
+            if (response.status === 201) {
+                alert('Registration successful! Redirecting to login...');
+                setIsLoading(false);
+                window.location.href = '/';
+            }
+        } catch (err: any) {
+            if (err.response) {
+                console.error('Backend error:', err.response.data);
+                alert(err.response.data.message || 'An error occurred during registration.');
+            }
             if (err instanceof yup.ValidationError) {
                 const validationErrors: { [key: string]: string } = {};
                 err.inner.forEach((error) => {
@@ -76,6 +86,7 @@ function Register() {
                 });
                 setErrors(validationErrors);
             }
+            setIsLoading(false);
         }
     };
 
@@ -115,17 +126,18 @@ function Register() {
                         <div className="bg-white p-8 rounded-lg shadow-xl w-[30rem]">
                             <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
                             
-                            <form onSubmit={handleSubmit}>
+                            <form method="post" onSubmit={handleSubmit}>
                                 {renderInputField("fullname", "Fullname", "text", "Enter your fullname")}
                                 {renderInputField("username", "Username", "text", "Enter your username")}
                                 {renderInputField("password", "Password", "password", "Enter your password")}
                                 {renderInputField("confirmPassword", "Confirm Password", "password", "Confirm your password")}
 
                                 <button
-                                    className="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                                    className="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:bg-slate-400 disabled:cursor-not-allowed"
                                     type="submit"
+                                    disabled={isLoading}
                                 >
-                                    Sign Up
+                                    {isLoading ? 'Signing up...' : 'Sign Up'}
                                 </button>
 
                                 <p className="text-sm text-center mt-4">
