@@ -85,7 +85,7 @@ function Login() {
             setErrors({});
 
             // Make API call to login endpoint
-            const response = await axios.post('http://localhost:3001/api/login', formData);
+            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, formData);
 
             // Store user data in localStorage
             localStorage.setItem('token', JSON.stringify(response.data.token));
