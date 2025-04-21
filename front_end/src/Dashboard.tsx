@@ -1,25 +1,53 @@
 import { useNavigate } from 'react-router-dom';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode'; // Install this library: npm install jwt-decode
 
 interface UserData {
     user: {
         fullname: string;
         username: string;
-    }
+    };
+    exp: number; // Token expiration time (in seconds since epoch)
 }
 
 const Dashboard: FC = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
-    if (!token) {
-        navigate('/');
-        return;
-    }
-    const decodedToken = jwt_decode(token) as UserData;
+    const [userData, setUserData] = useState<UserData | null>(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/');
+            return;
+        }
+
+        try {
+            const decodedToken = jwtDecode<UserData>(token);
+
+            // Check if the token is expired
+            const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+            if (decodedToken.exp < currentTime) {
+                localStorage.removeItem('token');
+                navigate('/');
+                return;
+            }
+
+            setUserData(decodedToken);
+        } catch (error) {
+            console.error('Invalid token:', error);
+            localStorage.removeItem('token');
+            navigate('/');
+        }
+    }, [navigate]);
+
     const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
         navigate('/');
     }, [navigate]);
+
+    if (!userData) {
+        return null; // Render nothing while checking token
+    }
 
     return (
         <div className="container mx-auto p-4">
@@ -41,7 +69,7 @@ const Dashboard: FC = () => {
             </div>
 
             <h1 className="text-3xl font-bold mb-4 text-center">
-                Welcome {decodedToken.user.fullname}!
+                Welcome {userData.user.fullname}!
             </h1>
             <div className="flex items-center justify-center mb-6">
                 <svg
@@ -84,17 +112,3 @@ const Dashboard: FC = () => {
 };
 
 export default Dashboard;
-function jwt_decode(token: string): UserData {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64).split('').map(c =>
-                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-            ).join('')
-        );
-        return JSON.parse(jsonPayload);
-    } catch (error) {
-        throw new Error('Invalid token');
-    }
-}
