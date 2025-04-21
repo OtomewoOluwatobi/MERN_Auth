@@ -97,40 +97,40 @@ function Register() {
     );
 
     return (
-        <div className="flex h-screen">
-            <div className="w-3/5" style={{ backgroundColor: "#bbcb9d" }}>
-                <div className="flex items-center justify-center h-full">
-                    <div className="bg-white p-8 rounded-lg shadow-xl w-[30rem]">
-                        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-                        <form onSubmit={handleSubmit}>
-                            {renderInputField("fullname", "Fullname", "text", "Enter your fullname")}
-                            {renderInputField("username", "Username", "text", "Enter your username")}
-                            {renderInputField("password", "Password", "password", "Enter your password")}
-                            {renderInputField("confirmPassword", "Confirm Password", "password", "Confirm your password")}
-                            <button
-                                className="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:bg-slate-400 disabled:cursor-not-allowed"
-                                type="submit"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Signing up...' : 'Sign Up'}
-                            </button>
-                            <p className="text-sm text-center mt-4">
-                                I already have an account?{" "}
-                                <a href="/" className="text-orange-500 hover:text-orange-800 font-bold">
-                                    Login
-                                </a>
-                            </p>
-                        </form>
-                    </div>
+        <div className="flex flex-col md:flex-row h-screen">
+            <div className="w-full md:w-3/5" style={{ backgroundColor: "#bbcb9d" }}>
+            <div className="flex items-center justify-center min-h-screen py-8 px-4">
+                <div className="bg-white p-4 md:p-8 rounded-lg shadow-xl w-full max-w-[30rem]">
+                <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Register</h2>
+                <form onSubmit={handleSubmit}>
+                    {renderInputField("fullname", "Fullname", "text", "Enter your fullname")}
+                    {renderInputField("username", "Username", "text", "Enter your username")}
+                    {renderInputField("password", "Password", "password", "Enter your password")}
+                    {renderInputField("confirmPassword", "Confirm Password", "password", "Confirm your password")}
+                    <button
+                    className="bg-slate-900 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:bg-slate-400 disabled:cursor-not-allowed"
+                    type="submit"
+                    disabled={isLoading}
+                    >
+                    {isLoading ? 'Signing up...' : 'Sign Up'}
+                    </button>
+                    <p className="text-sm text-center mt-4">
+                    I already have an account?{" "}
+                    <a href="/" className="text-orange-500 hover:text-orange-800 font-bold">
+                        Login
+                    </a>
+                    </p>
+                </form>
                 </div>
             </div>
+            </div>
             <div
-                className="w-1/2"
-                style={{
-                    backgroundImage: `url(${test_bg})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                }}
+            className="hidden md:block w-full md:w-2/5"
+            style={{
+                backgroundImage: `url(${test_bg})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+            }}
             />
         </div>
     );

@@ -115,12 +115,12 @@ function Login() {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex flex-col md:flex-row h-screen">
             {/* Login form container */}
-            <div className="w-3/5" style={{ backgroundColor: "#bbcb9d" }}>
-                <div className="flex items-center justify-center h-full">
-                    <div className="bg-white p-8 rounded-lg shadow-xl w-[30rem]">
-                        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+            <div className="w-full md:w-3/5 order-2 md:order-1" style={{ backgroundColor: "#bbcb9d" }}>
+                <div className="flex items-center justify-center min-h-screen px-4 py-8">
+                    <div className="bg-white p-4 sm:p-8 rounded-lg shadow-xl w-full max-w-md mx-auto">
+                        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Login</h2>
 
                         <form onSubmit={handleSubmit}>
                             {renderFormField("username", "Username", "text", "Enter your username")}
@@ -128,7 +128,7 @@ function Login() {
 
                             <div className="flex items-center justify-between mb-6">
                                 <a className="inline-block align-baseline font-bold text-sm 
-                                          text-orange-500 hover:text-orange-800"
+                          text-orange-500 hover:text-orange-800"
                                     href="#">
                                     Forgot Password?
                                 </a>
@@ -136,8 +136,8 @@ function Login() {
 
                             <button
                                 className={`w-full px-4 py-2 font-bold text-white rounded 
-                                           bg-slate-900 hover:bg-slate-700 focus:outline-none 
-                                           focus:shadow-outline ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                           bg-slate-900 hover:bg-slate-700 focus:outline-none 
+                           focus:shadow-outline ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 type="submit"
                                 disabled={isLoading}
                             >
@@ -156,7 +156,7 @@ function Login() {
             </div>
 
             {/* Background image */}
-            <div className="w-1/2"
+            <div className="hidden md:block md:w-2/5 order-1 md:order-2"
                 style={{
                     backgroundImage: `url(${test_bg})`,
                     backgroundSize: "cover",
