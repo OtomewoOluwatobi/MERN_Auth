@@ -1,5 +1,5 @@
 import * as yup from "yup"; // Add this if not already imported
-import User from "../model/user.js"; // Adjust the import path as necessary
+import User from "../model/User.js"; // Adjust the import path as necessary
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
