@@ -105,6 +105,7 @@ function Login() {
             } else if (err.response) {
                 // Handle API errors
                 console.error('Backend error:', err.response.data);
+                alert(err.response.data.message);
                 if (err.response.data.message) {
                     setErrors({ general: err.response.data.message });
                 }
